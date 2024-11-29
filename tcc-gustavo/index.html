@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bibliotech</title>
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=close" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=delete" />
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <h1> Bibliotech </h1>
+            <img src="assets/img/poi 2.png" alt="logo">
+        </div>
+    </header>
+
+    <div class="linha"></div>
+
+    <!-- Formulário para adicionar livro -->
+    <form id="book-form">
+        <input type="text" id="book-title" placeholder="Título do Livro" required>
+        <input type="text" id="book-author" placeholder="Nome do Autor" required>
+        <input type="text" id="book-genre" placeholder="Gênero do Livro" required>
+        <input type="number" id="book-quantity" placeholder="Quantidade" min="1" required>
+        <!-- Campo para upload de imagem -->
+        <input type="file" id="book-image" accept="image/*" required>
+        <button type="submit">Adicionar Livro</button>
+    </form>
+
+    <h2>Cadastrados</h2>
+
+    <!-- Tabela para exibir os livros -->
+    <table id="book-table">
+        <tr>
+            <th>ID</th>
+            <th>Nome do Autor</th>
+            <th>Título</th>
+            <th>Gênero</th>
+            <th>Quantidade</th>
+            <th>Imagem</th>  <!-- Coluna de imagem -->
+            <th>Ações</th><
+        </tr>
+    </table>
+
+    <script>
+        // Captura o formulário e a tabela
+        const form = document.getElementById('book-form');
+        const bookTable = document.getElementById('book-table');
+        let editingRow = null;  // Para armazenar a linha sendo editada
+
+        // Função para adicionar livro à tabela
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();  // Previne o envio do formulário (recarga da página)
+
+            // Obtém os dados do formulário
+            const title = document.getElementById('book-title').value;
+            const author = document.getElementById('book-author').value;
+            const genre = document.getElementById('book-genre').value;
+            const quantity = document.getElementById('book-quantity').value;
+            const image = document.getElementById('book-image').files[0];
+
+            // Cria um ID único para cada livro (aqui é só um exemplo simples)
+            const bookId = bookTable.rows.length;
+
+            // Cria uma nova linha na tabela ou edita a linha existente
+            const newRow = editingRow || bookTable.insertRow();
+
+            // Cria as células para a nova linha
+            const idCell = newRow.insertCell(0);
+            const authorCell = newRow.insertCell(1);
+            const titleCell = newRow.insertCell(2);
+            const genreCell = newRow.insertCell(3);
+            const quantityCell = newRow.insertCell(4);
+            const imageCell = newRow.insertCell(5);
+            const actionsCell = newRow.insertCell(6);
+
+            // Preenche as células com os dados
+            idCell.textContent = bookId;  // ID é o número de linhas da tabela (ajustado)
+            authorCell.textContent = author;
+            titleCell.textContent = title;
+            genreCell.textContent = genre;
+            quantityCell.textContent = quantity;
+
+            // Exibe a imagem
+            const imgElement = document.createElement('img');
+            imgElement.src = image ? URL.createObjectURL(image) : '';
+            imgElement.alt = title;
+            imgElement.width = 50;
+            imageCell.appendChild(imgElement);
+
+            // Adiciona as ações (como editar e excluir)
+            actionsCell.innerHTML = `
+                <a href="#" class="delete"><img class="lixo" src="assets/img/lixeira-de-reciclagem.png" alt="Excluir"> </a>
+                <a href="#" class="edit"><img src="assets/img/edit.png" alt="Editar" class="edit"> </a>
+            `;
+
+            // Limpa o formulário após a adição
+            form.reset();
+
+            // Se for uma edição, limpa a variável 'editingRow' e o formulário
+            if (editingRow) {
+                editingRow = null;
+            }
+        });
+
+        // Função para excluir um livro
+        document.addEventListener('click', function (e) {
+            if (e.target && e.target.classList.contains('delete')) {
+                const row = e.target.closest('tr');
+                row.remove();
+            }
+        });
+
+        // Função para editar um livro
+        document.addEventListener('click', function (e) {
+            if (e.target && e.target.classList.contains('edit')) {
+                const row = e.target.closest('tr');
+                const cells = row.cells;
+
+                // Preenche o formulário com os dados da linha
+                document.getElementById('book-title').value = cells[2].textContent;
+                document.getElementById('book-author').value = cells[1].textContent;
+                document.getElementById('book-genre').value = cells[3].textContent;
+                document.getElementById('book-quantity').value = cells[4].textContent;
+
+                // Atualiza a imagem
+                const img = cells[5].querySelector('img');
+                document.getElementById('book-image').value = '';  // Limpa o campo de imagem (não é possível manipular diretamente o input de file)
+                
+                // Marca a linha como sendo editada
+                editingRow = row;
+            }
+        });
+    </script>
+
+    <script src="script.js"></script>
+</body>
+</html>
